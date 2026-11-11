@@ -38,6 +38,8 @@ jobs:
           KS: ${{ secrets.FDROID_KEYSTORE_B64 }}
         run: |
           echo "$KS" | base64 -d > keystore.p12
+          mkdir -p repo/icons
+          cp icon.png repo/icons/icon.png
           echo "sdk_path: $ANDROID_HOME" >> config.yml
           chmod 600 config.yml keystore.p12
       - name: fdroid update
