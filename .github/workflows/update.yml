@@ -1,0 +1,65 @@
+name: Update F-Droid repo
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fdroidserver
+        run: pip install fdroidserver
+      - name: Download APKs (latest 3 releases)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p repo
+          for t in $(gh release list -R gordonpow/PiliBTRTV -L 3 --exclude-drafts --exclude-pre-releases --json tagName -q '.[].tagName'); do
+            gh release download "$t" -R gordonpow/PiliBTRTV -p '*.apk' -D repo --skip-existing
+          done
+          ls -la repo
+      - name: Restore keystore
+        env:
+          KS: ${{ secrets.FDROID_KEYSTORE_B64 }}
+        run: |
+          echo "$KS" | base64 -d > keystore.p12
+          echo "sdk_path: $ANDROID_HOME" >> config.yml
+          chmod 600 config.yml keystore.p12
+      - name: fdroid update
+        env:
+          FDROID_KEYSTORE_PASS: ${{ secrets.FDROID_KEYSTORE_PASS }}
+        run: fdroid update --pretty
+      - name: Prepare site
+        run: |
+          mkdir -p site
+          cp -r repo site/repo
+          cp index.html site/index.html
+          rm -f keystore.p12
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

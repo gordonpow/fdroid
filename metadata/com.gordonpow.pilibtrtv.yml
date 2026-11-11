@@ -1,0 +1,20 @@
+Categories:
+  - Multimedia
+License: Unknown
+AuthorName: gordonpow
+WebSite: https://github.com/gordonpow/PiliBTRTV
+SourceCode: https://github.com/gordonpow/PiliBTRTV
+IssueTracker: https://github.com/gordonpow/PiliBTRTV/issues
+Changelog: https://github.com/gordonpow/PiliBTRTV/releases
+AntiFeatures:
+  - NonFreeNet
+  - NonFreeDep
+
+Name: PiliBTRTV
+Summary: Android TV 第三方 B站用戶端，含多 CDN 播放加速
+Description: |-
+  Android TV 版第三方 B站用戶端，基於 BiliTV，加上「線程撕裂者」（BTR）多 CDN 播放加速。
+  非官方 App，與 Bilibili 無關。高畫質需要登入，不支援付費內容。
+
+  An unofficial third-party Bilibili client for Android TV with BTR multi-CDN acceleration.
+  Not affiliated with Bilibili.
